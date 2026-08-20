@@ -23,6 +23,7 @@ WEIGHTS = {
     "mastery":    1.0,
     "stand":      1.0,
     "mount":      1.0,
+    "goddess":    1.0,
 }
 
 CP_TIER_LABELS = [
@@ -109,6 +110,14 @@ def _mount_score(player: dict) -> float:
     except Exception:
         return 0.0
 
+def _goddess_score(player: dict) -> float:
+    """سهمِ چیت‌اسکیلِ الهه‌ی آغازها (goddess_system.py)."""
+    try:
+        from goddess_system import goddess_power_bonus
+        return goddess_power_bonus(player) * WEIGHTS["goddess"]
+    except Exception:
+        return 0.0
+
 def calculate_combat_power(player: dict) -> int:
     total = (
         _level_score(player)
@@ -121,6 +130,7 @@ def calculate_combat_power(player: dict) -> int:
         + _mastery_score(player)
         + _stand_score(player)
         + _mount_score(player)
+        + _goddess_score(player)
     )
     return int(total)
 
@@ -137,6 +147,7 @@ def get_cp_breakdown(player: dict) -> dict:
         "mastery":    int(_mastery_score(player)),
         "stand":      int(_stand_score(player)),
         "mount":      int(_mount_score(player)),
+        "goddess":    int(_goddess_score(player)),
     }
 
 def get_cp_label(cp: int) -> str:
@@ -173,5 +184,6 @@ def format_cp_card(player: dict) -> str:
         f"  📖 مسترى: {breakdown['mastery']:,}",
         f"  👻 استند: {breakdown['stand']:,}",
         f"  🐎 مونت: {breakdown['mount']:,}",
+        f"  🕊 الهه: {breakdown['goddess']:,}",
     ]
     return "\n".join(lines)
